@@ -1,0 +1,36 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: 5s
+  write_timeout: 10s
+  idle_timeout: 120s
+
+rate_limiter:
+  default_limit: 100
+  default_window: 60s
+  default_algorithm: "fixed_window"
+  overrides:
+    - client_id: "trusted-api-123"
+      limit: 1000
+      algorithm: "token_bucket"
+      window: 60s
+    - client_id: "free-tier-client"
+      limit: 10
+      algorithm: "fixed_window"
+      window: 60s
+
+storage:
+  memory:
+    max_clients: 10000
+    default_ttl: 10m
+  persistence:
+    enabled: false
+    db_path: "./data/rate-limiter.db"
+    flush_interval: 5s
+    flush_threshold: 1000
+    checkpoint_interval: 1h
+
+telemetry:
+  metrics_enabled: true
+  log_level: "info"
+  log_format: "json"
