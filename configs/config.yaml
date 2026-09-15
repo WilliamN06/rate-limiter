@@ -20,15 +20,17 @@ rate_limiter:
       window: 60s
 
 storage:
+  type: "memory"  # or "sqlite"
   memory:
     max_clients: 10000
     default_ttl: 10m
-  persistence:
-    enabled: false
-    db_path: "./data/rate-limiter.db"
-    flush_interval: 5s
-    flush_threshold: 1000
-    checkpoint_interval: 1h
+
+persistence:
+  enabled: true  # Set to true to enable SQLite persistence
+  db_path: "./data/rate-limiter.db"
+  flush_interval: 5s
+  flush_threshold: 1000
+  checkpoint_interval: 1h
 
 telemetry:
   metrics_enabled: true

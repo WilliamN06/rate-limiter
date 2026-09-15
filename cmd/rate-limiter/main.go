@@ -13,6 +13,7 @@ import (
 	"github.com/WilliamN06/rate-limiter/internal/limiter"
 	"github.com/WilliamN06/rate-limiter/internal/limiter/algorithms"
 	"github.com/WilliamN06/rate-limiter/internal/storage/memory"
+	"github.com/WilliamN06/rate-limiter/internal/storage/sqlite"
 	"github.com/WilliamN06/rate-limiter/internal/telemetry"
 )
 
@@ -45,8 +46,45 @@ func main() {
 		"config", configPath,
 	)
 
-	// Initialize storage
-	store := memory.NewInMemoryStore()
+	// Initialize storage based on configuration
+	var store interface {
+		// All store interfaces
+	}
+
+	if cfg.Persistence.Enabled {
+		slog.Info("using SQLite storage with persistence", "db_path", cfg.Persistence.DBPath)
+		
+		// Create data directory if it doesn't exist
+		if err := os.MkdirAll("./data", 0755); err != nil {
+			slog.Error("failed to create data directory", "error", err)
+			os.Exit(1)
+		}
+
+		sqliteConfig := &sqlite.Config{
+			DBPath:         cfg.Persistence.DBPath,
+			FlushInterval:  cfg.Persistence.FlushInterval,
+			FlushThreshold: cfg.Persistence.FlushThreshold,
+			MaxOpenConns:   10,
+			MaxIdleConns:   5,
+		}
+		
+		store, err = sqlite.NewSQLiteStore(sqliteConfig)
+		if err != nil {
+			slog.Error("failed to create SQLite store", "error", err)
+			os.Exit(1)
+		}
+		
+		slog.Info("SQLite storage initialized successfully")
+	} else {
+		slog.Info("using in-memory storage (no persistence)")
+		
+		memoryConfig := &memory.StoreConfig{
+			MaxKeys:          cfg.Storage.Memory.MaxClients,
+			RingBufferCapacity: 1000,
+			CleanupInterval: 5 * time.Minute,
+		}
+		store = memory.NewInMemoryStoreWithConfig(memoryConfig)
+	}
 
 	// Initialize rate limiter engine
 	algorithmsMap := make(map[limiter.Algorithm]limiter.Limiter)

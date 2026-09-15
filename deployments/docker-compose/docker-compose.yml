@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  rate-limiter:
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+    image: rate-limiter:latest
+    container_name: rate-limiter
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/app/configs/config.yaml:ro
+      - ./data:/app/data
+    environment:
+      - RATE_LIMITER_CONFIG=/app/configs/config.yaml
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

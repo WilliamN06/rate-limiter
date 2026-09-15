@@ -1,0 +1,35 @@
+[Unit]
+Description=Rate Limiter Service
+Documentation=https://github.com/WilliamN06/rate-limiter
+After=network.target
+
+[Service]
+Type=simple
+User=rate-limiter
+Group=rate-limiter
+WorkingDirectory=/opt/rate-limiter
+ExecStart=/opt/rate-limiter/rate-limiter --config /opt/rate-limiter/configs/config.yaml
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# Security hardening
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/rate-limiter/data /opt/rate-limiter/logs
+ProtectProc=invisible
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rate-limiter
+
+[Install]
+WantedBy=multi-user.target
