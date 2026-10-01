@@ -21,9 +21,9 @@ A self-hostable, single-binary rate limiting service for indie developers and sm
 
 ```bash
 # Linux
-curl -L https://github.com/yourusername/rate-limiter/releases/latest/download/rate-limiter-linux-amd64 -o rate-limiter
+curl -L https://github.com/WilliamN06/rate-limiter/releases/latest/download/rate-limiter-linux-amd64 -o rate-limiter
 chmod +x rate-limiter
 
 # macOS
-curl -L https://github.com/yourusername/rate-limiter/releases/latest/download/rate-limiter-darwin-amd64 -o rate-limiter
+curl -L https://github.com/WilliamN06/rate-limiter/releases/latest/download/rate-limiter-darwin-amd64 -o rate-limiter
 chmod +x rate-limiter
